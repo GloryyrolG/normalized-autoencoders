@@ -19,7 +19,7 @@ data:
     split: validation
   ood_target:
     batch_size: 128
-    dataset: Constant_OOD
+    dataset: CIFAR10_OOD  # Constant_OOD
     n_workers: 8
     path: datasets
     size: 32
@@ -27,7 +27,7 @@ data:
   ood_val:
     batch_size: 128
     channel: 3
-    dataset: SVHN_OOD
+    dataset: CIFAR10_OOD  # SVHN_OOD
     n_workers: 8
     path: datasets
     split: validation
@@ -73,7 +73,7 @@ model:
   z_dim: 32
 trainer: nae
 training:
-  ae_epoch: 180
+  ae_epoch: 0  # 180
   ae_lr: 0.0001
   fix_D: false
   lr_schedule: null

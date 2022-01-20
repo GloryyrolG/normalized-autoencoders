@@ -15,6 +15,9 @@ from tensorboardX import SummaryWriter
 from utils import save_yaml, search_params_intp, eprint, parse_unknown_args, parse_nested_args
 
 
+# os.environ['CUDA_VISIBLE_DEVICES'] = '1'
+
+
 def run(cfg, writer):
     """main training function"""
     # Setup seeds

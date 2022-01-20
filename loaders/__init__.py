@@ -140,6 +140,7 @@ def get_dataset(data_dict, split_type=None, data_aug=None, dequant=None):
     elif name == 'CIFAR10_OOD':
         dataset = CIFAR10_OOD(data_path, split=split_type, download=True,
                               transform=data_aug)
+        print("> dataset", dataset)
         dataset.img_size = (OOD_SIZE, OOD_SIZE)
 
     elif name == 'CIFAR10LeaveOut':
@@ -163,6 +164,7 @@ def get_dataset(data_dict, split_type=None, data_aug=None, dequant=None):
     elif name == 'SVHN_OOD':
         dataset = SVHN_OOD(data_path, split=split_type, download=True,
                            transform=data_aug)
+        print(f"> data_aug {data_aug}")
         dataset.img_size = (OOD_SIZE, OOD_SIZE)
 
     elif name == 'Constant_OOD':
@@ -196,8 +198,28 @@ def get_dataset(data_dict, split_type=None, data_aug=None, dequant=None):
         if dequant is not None:
             l_aug.append(dequant)
         data_aug = Compose(l_aug)
+        print(f"> data_aug {data_aug}")
         dataset = CelebA_OOD(data_path, split=split_type,
                              transform=data_aug)
+        dataset.img_size = (OOD_SIZE, OOD_SIZE)
+
+    elif name == 'CelebA_SVHN_OOD':
+        size = data_dict.get('size', OOD_SIZE)
+        l_aug = []
+        l_aug.append(Resize(size))
+        if original_data_aug is not None:
+            l_aug.append(original_data_aug)
+        l_aug.append(ToTensor())
+        if dequant is not None:
+            l_aug.append(dequant)
+        data_aug = Compose(l_aug)
+        print(f"> data_aug {data_aug}")
+
+        # This is for using same data_aug.
+        import warnings; warnings.warn("> Testing OOD SVHN")
+        dataset = SVHN_OOD(data_path, split=split_type, download=True,
+                           transform=data_aug)
+
         dataset.img_size = (OOD_SIZE, OOD_SIZE)
 
     elif name == 'FashionMNIST':   # normal FashionMNIS

@@ -18,8 +18,8 @@ model:
     nae:
         spherical: True
         gamma: 1
-        delta: Null
-        deterministic: True
+        # delta: Null
+        # deterministic: True
         sampling: on_manifold
 
         z_step: 20
@@ -43,7 +43,7 @@ model:
         z_bound: Null
         l2_norm_reg: Null
         l2_norm_reg_en: Null
-        sigma: 0.001
+        # sigma: 0.001
         temperature: 1.
         temperature_trainable: False
 
@@ -81,7 +81,7 @@ data:
         dequant:
           togray: {}
     ood_target:
-        dataset: ConstantGray_OOD 
+        dataset: CelebA_OOD 
         size: 64
         path: datasets
         batch_size: 128
@@ -89,7 +89,7 @@ data:
         split: validation
 training:
   # load_ae: /opt/home3/swyoon/energy-based-autoencoder/src/results/celeba_ood_nae/big/run/model_best.pkl
-    ae_epoch: 30
+    ae_epoch: 0  # 30
     nae_epoch: 15
     lr_schedule: null
         # name: on_plateau

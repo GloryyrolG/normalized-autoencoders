@@ -29,7 +29,7 @@ parser.add_argument('--ckpt', type=str, help='checkpoint file name to load. defa
 parser.add_argument('--ood', type=str, help='list of OOD datasets, separated by comma')
 parser.add_argument('--device', type=str, help='device')
 parser.add_argument('--dataset', type=str, choices=['MNIST_OOD', 'CIFAR10_OOD', 'ImageNet32', 'FashionMNIST_OOD',
-                                                    'FashionMNISTpad_OOD'],
+                                                    'FashionMNISTpad_OOD', 'CelebA_OOD'],
                     default='MNIST', help='inlier dataset dataset')
 parser.add_argument('--aug', type=str, help='pre-defiend data augmentation', choices=[None, 'CIFAR10', 'CIFAR10-OE'])
 parser.add_argument('--method', type=str, choices=[None, 'likelihood_regret', 'input_complexity', 'outlier_exposure'])
@@ -68,6 +68,9 @@ print(l_ood)
 if args.dataset in {'MNIST_OOD', 'FashionMNIST_OOD'}:
     size = 28
     channel = 1
+elif args.dataset == 'CelebA_OOD':
+    size = 64
+    channel = 3
 else:
     size = 32
     channel = 3
@@ -92,11 +95,11 @@ for ood_name in l_ood:
     l_ood_dl.append(dl)
 
 model = get_model(cfg).to(device)
-ckpt_data = torch.load(ckpt_file)
+ckpt_data = torch.load(ckpt_file, map_location='cuda:0')
 if 'model_state' in ckpt_data:
     model.load_state_dict(ckpt_data['model_state'])
 else:
-    model.load_state_dict(torch.load(ckpt_file))
+    model.load_state_dict(torch.load(ckpt_file, map_location='cuda:0'))
 
 model.eval()
 model.to(device)

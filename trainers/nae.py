@@ -100,8 +100,11 @@ class NAETrainer(BaseTrainer):
 
         '''NAE PASS'''
         # load best autoencoder model
-        #  model.load_state_dict(torch.load(os.path.join(logdir, 'model_best.pkl'))['model_state'])
-        # print('best model loaded')
+        ckpt_name = 'model_last.pkl'
+        print(f"> Loading {ckpt_name}")
+        model.load_state_dict(torch.load(os.path.join(logdir, ckpt_name), map_location='cuda:0')['model_state'])
+        # model.load_state_dict(torch.load(os.path.join(logdir, ckpt_name), map_location='cuda:0'))
+        print('best model loaded')
         i = 0
         for i_epoch in tqdm(range(n_nae_epoch)):
             for x, _ in tqdm(indist_train_loader):
@@ -199,8 +202,14 @@ class NAELogger(BaseLogger):
         recon_neg = d_result['recon_neg']
         img_grid = make_grid(x_neg, nrow=10, range=(0, 1))
         writer.add_image('nae/sample', img_grid, i)
+        x_pos = d_result['x_pos']
+        img_grid = make_grid(x_pos, nrow=10, range=(0, 1))
+        writer.add_image('nae/data', img_grid, i)
         img_grid = make_grid(recon_neg, nrow=10, range=(0, 1), normalize=True)
         writer.add_image('nae/sample_recon', img_grid, i)
+        recon_pos = d_result['recon_pos']
+        img_grid = make_grid(recon_pos, nrow=10, range=(0, 1), normalize=True)
+        writer.add_image('nae/data_recon', img_grid, i)
 
         # to uint8 and save as array
         x_neg = (x_neg.permute(0,2,3,1).numpy() * 256.).clip(0, 255).astype('uint8')

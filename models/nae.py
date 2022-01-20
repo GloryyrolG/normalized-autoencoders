@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 from torch import nn
-from torchvision.utils import make_grid 
+from torchvision.utils import make_grid, save_image 
 from models.ae import AE
 from models.modules import IsotropicLaplace, DummyDistribution
 from models.energybased import SampleBuffer, SampleBufferV2
@@ -306,6 +306,9 @@ class NAE(FFEBM):
         if self.x_bound is not None:
             sample_x_1.clamp_(self.x_bound[0], self.x_bound[1])
 
+        # image_grid = make_grid(sample_x_1[: 8])
+        # save_image(image_grid, "results/omi.png")
+
         # Step 2: LMC on X space
         d_sample_x = self.sample_x(x0=sample_x_1, replay=False)
         sample_x_2 = d_sample_x['sample_x']
@@ -369,6 +372,7 @@ class NAE(FFEBM):
 
         # negative sample
         d_sample = self.sample(x)
+        # d_sample = self.sample(n_sample=x.shape[0], device=x.device)
         x_neg = d_sample['sample_x']
 
         opt.zero_grad()
@@ -385,7 +389,7 @@ class NAE(FFEBM):
 
         # regularizing negative sample energy
         if self.gamma is not None:
-            gamma_term = ((neg_e) ** 2).mean()
+            gamma_term = ((pos_e) ** 2 + (neg_e) ** 2).mean()
             loss += self.gamma * gamma_term
 
         # weight regularization
@@ -406,8 +410,10 @@ class NAE(FFEBM):
         x_neg_0 = d_sample['sample_x0']
         neg_e_x0 = self.energy(x_neg_0)  # energy of samples from latent chain
         recon_neg = self.reconstruct(x_neg)
+        recon_pos = self.reconstruct(x)
         d_result = {'pos_e': pos_e.mean().item(), 'neg_e': neg_e.mean().item(),
                     'x_neg': x_neg.detach().cpu(), 'recon_neg': recon_neg.detach().cpu(),
+                    'x_pos': x.cpu(), 'recon_pos': recon_pos.detach().cpu(),
                     'loss': loss.item(), 'sample': x_neg.detach().cpu(),
                     'decoder_norm': decoder_norm.item(), 'encoder_norm': encoder_norm.item(),
                     'neg_e_x0': neg_e_x0.mean().item(), 'x_neg_0': x_neg_0.detach().cpu(),
