@@ -17,11 +17,7 @@ Arxiv: https://arxiv.org/abs/2105.05735
 - [x] OOD detection performance script  (`evaluate_ood.py`)
 - [x] Sampling script (`sample.py`)
 - [x] Pretrained models for MNIST, CIFAR-10, CelebA64
-- [ ] 2D Experiments
-- [ ] MNIST hold-out experiments
-- [ ] Pretrained models for MNIST hold-out and ImageNet32
-- [ ] Generating Noise dataset on-the-fly
-- [ ] Reproducible environment (conda environment or docker)
+- [x] 2D Experiments
 
 Updates on the repository and the releases of other materials will be broadcasted through the mailing list. If you want to be kept in touch, please sign up for [the mailing list](https://mailchi.mp/32e7ca8a0a85/autoencoding-under-normalization-constraints).
 
@@ -90,7 +86,7 @@ pretrained
     └── z32
 ```
 
-## Testing
+## Unittesting
 
 PyTest is used for unittesting.
 
@@ -100,9 +96,9 @@ pytest tests
 
 The code should pass all tests after the preparation of pre-trained models and datasets.
 
-## Running
+## Execution 
 
-**OOD Detection Evaluation**
+### OOD Detection Evaluation
 
 ```
 python evaluate_ood.py --ood ConstantGray_OOD,FashionMNIST_OOD,SVHN_OOD,CelebA_OOD,Noise_OOD --resultdir pretrained/cifar_ood_nae/z32gn/ --ckpt nae_9.pkl --config z32gn.yml --device 0 --dataset CIFAR10_OOD
@@ -122,25 +118,72 @@ python evaluate_ood.py --ood ConstantGray_OOD,FashionMNIST_OOD,SVHN_OOD,CelebA_O
 </details>
 
 
-**Training**
+### Training
 
+Use `train.py` to train NAE. 
+* `--config` option specifies a path to a configuration yaml file.
+* `--logdir` specifies a directory where results files will be written.
+* `--run` specifies an id for each run, i.e., an experiment.
+
+Training on MNIST
 ```
 python train.py --config configs/mnist_ood_nae/z32.yml --logdir results/mnist_ood_nae/ --run run --device 0
 ```
 
+Training on CIFAR-10
 ```
 python train.py --config configs/cifar_ood_nae/z32gn.yml --logdir results/cifar_ood_nae/ --run run --device 0
 ```
 
+Training on CelebA 64x64
+```
+python train.py --config configs/celeba64_ood_nae/z64gr_h32g8.yml --logdir results/celeba64_ood_nae/z64gr_h32g8.yml --run run --device 0
+```
+
+
+### Sampling
+
+Use `sample.py` to generate sample images form NAE. Samples are saved as `.npy` file containing an `(n_sample, img_h, img_w, channels)` array.
+Note that the quality of generated images is not supposed to match that of state-of-the-art generative models. Improving the sample quality is one of the important future research direction.
+
+Sampling for CIFAR-10
+```
+python sample.py pretrained/cifar_ood_nae/z32gn/ z32gn.yml nae_8.pkl --zstep 180 --xstep 40 --batch_size 64 --n_sample 64 --name run --device 0
+```
+
+
+Sampling for CelebA 64x64
+```
+python sample.py pretrained/celeba64_ood_nae/z64gr_h32g8/ z64gr_h32g8.yml nae_3.pkl --zstep 180 --xstep 40 --batch_size 64 --n_sample 64 --name run --device 0 --x_shape 64
+```
+
+
+Sample images for CIFAR-10 and CelebA 64x64
+
+![cifar10samples](cifar10samples.png)
+
+![celeba64samples](celeba64samples.png)
+
+
+
 ## Citation
 
-The bibtex will be updated to the official ICML version once the proceedings are out.
 
 ```
-@article{yoon2021autoencoding,
-  title={Autoencoding Under Normalization Constraints},
-  author={Yoon, Sangwoong and Noh, Yung-Kyun and Park, Frank Chongwoo},
-  journal={arXiv preprint arXiv:2105.05735},
-  year={2021}
+@InProceedings{pmlr-v139-yoon21c,
+  title = 	 {Autoencoding Under Normalization Constraints},
+  author =       {Yoon, Sangwoong and Noh, Yung-Kyun and Park, Frank},
+  booktitle = 	 {Proceedings of the 38th International Conference on Machine Learning},
+  pages = 	 {12087--12097},
+  year = 	 {2021},
+  editor = 	 {Meila, Marina and Zhang, Tong},
+  volume = 	 {139},
+  series = 	 {Proceedings of Machine Learning Research},
+  month = 	 {18--24 Jul},
+  publisher =    {PMLR},
+  pdf = 	 {http://proceedings.mlr.press/v139/yoon21c/yoon21c.pdf},
+  url = 	 {https://proceedings.mlr.press/v139/yoon21c.html}
 }
+ 
 ```
+
