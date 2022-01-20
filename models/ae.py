@@ -297,7 +297,11 @@ class VAE(AE):
         self.z_shape = z_shape[1:]
 
     def sample_z(self, n_sample, device):
-        z_shape = (n_sample,) + self.z_shape
+        if self.z_shape is None:
+            z_shape = (self.encoder.out_dim // 2,)
+        else:
+            z_shape = self.z_shape
+        z_shape = (n_sample,) + z_shape
         return torch.randn(z_shape, device=device, dtype=torch.float)
 
     def sample(self, n_sample, device):
