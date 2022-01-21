@@ -88,7 +88,7 @@ print("vae", vae)
 fig, axes = plt.subplots(1, 2, figsize=(10, 5))
 with torch.no_grad():
     sample = vae.sample(1024, device)
-axes[0].scatter(sample['sample_x'][:, 0], sample['sample_x'][:, 1])
+axes[0].scatter(sample['sample_x'][:, 0], sample['sample_x'][:, 1], s=8)
 
 # %%
 vae.n_sample = 100
@@ -109,7 +109,7 @@ vae.to(device);
 # Sampling VAEs.
 with torch.no_grad():
     sample = vae.sample(1024, device)
-axes[1].scatter(sample['sample_x'][:, 0], sample['sample_x'][:, 1])
+axes[1].scatter(sample['sample_x'][:, 0], sample['sample_x'][:, 1], s=8)
 plt.savefig('../results/vae_sample_x.png')
 plt.close()
 
@@ -244,7 +244,7 @@ p_nae_3.max()
 p_8gaussian.max()
 
 # %%
-p_ae.max()
+print(f"p_ae.max() {p_ae.max()}")
 
 # %%
 cat_p = np.concatenate([p_ae.flatten(), p_vae.flatten(), p_nae.flatten(), p_ae_3.flatten(), p_nae_3.flatten()]) # p_vae_3.flatten(),

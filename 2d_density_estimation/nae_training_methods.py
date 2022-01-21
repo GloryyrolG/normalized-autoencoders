@@ -6,12 +6,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 sys.path.append('../')
-from tqdm.notebook import tqdm
+from tqdm import tqdm
+import io
+import PIL
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.optim import Adam
+from tensorboardX import SummaryWriter
+from torchvision import transforms
 
 from models.modules import FCNet, IsotropicGaussian, FCResNet
 from models.ae import AE, VAE
@@ -22,8 +26,22 @@ from loaders.synthetic import sample2d
 from IPython.display import clear_output
 
 
+def gen_plot():
+    """Create a pyplot plot and save to buffer."""
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+
+    image = PIL.Image.open(buf)
+    image = transforms.ToTensor()(image)  # .unsqueeze(0)
+    return image
+
+
+tb_writer = SummaryWriter('../results/runs')
+ 
+
 # %%
-device = 'cuda:1'
+device = 'cuda:0'
 
 # %%
 dset = '8gaussians'
@@ -106,9 +124,13 @@ for i_iter in tqdm(range(n_iter)):
         img = axs[5].imshow(np.exp(-E.T)/Omega, origin='lower', extent=(-4, 4, -4, 4))
         fig.colorbar(img, ax=axs[5])
         plt.tight_layout()
-        plt.show()
+        # plt.show()
+        # plt.savefig('../results/nae_training_process.png')
+        tb_writer.add_image('nae_training_process', gen_plot(), global_step=i_iter)
+        plt.close()
         
-# torch.save(nae.state_dict(), f'nae_{zdim}_{dset}.pth')
+torch.save(nae.state_dict(), f'../results/nae_{zdim}_{dset}.pth')
+exit(0)
 
 # %%
 zdim = 3
@@ -117,12 +139,11 @@ decoder = FCResNet(zdim, 2, res_dim=256, n_res_hidden=1024, n_resblock=5, out_ac
 nae = NAE(encoder, decoder, sampling='on_manifold',
            x_step=30, x_stepsize=None, x_noise_std=0.1, x_bound=(-5, 5), x_clip_langevin_grad=None,
            z_step=10, z_stepsize=None, z_noise_std=0.2, z_bound=None, z_clip_langevin_grad=None,
-           gamma=1, delta=0., spherical=False,
-           sigma=1, sigma_trainable=False,
+           gamma=1, spherical=False,
            temperature=0.1, temperature_trainable=True,
            l2_norm_reg=None, l2_norm_reg_en=None, z_norm_reg=0.01,
            initial_dist='gaussian', replay=True, replay_ratio=0.95, buffer_size=10000,
-           deterministic=True, mh=True, mh_z=False, reject_boundary=True, reject_boundary_z=True)
+           mh=True, mh_z=False, reject_boundary=True, reject_boundary_z=True)
 
 nae.to(device)
 
@@ -174,11 +195,14 @@ for i_iter in tqdm(range(n_iter)):
         img = axs[5].imshow(np.exp(-E.T)/Omega, origin='lower', extent=(-4, 4, -4, 4))
         fig.colorbar(img, ax=axs[5])
         plt.tight_layout()
-        plt.show()
+        # plt.show()
+        # plt.savefig('../results/nae_training_process.png')
+        tb_writer.add_image('nae_training_process', gen_plot(), global_step=i_iter)
+        plt.close()
         
-torch.save(nae.state_dict(), f'nae_{zdim}_{dset}.pth')
+torch.save(nae.state_dict(), f'../results/nae_{zdim}_{dset}.pth')
 
 # %%
-torch.save(nae.state_dict(), f'nae_{zdim}_{dset}.pth')
+torch.save(nae.state_dict(), f'../results/nae_{zdim}_{dset}.pth')
 
 

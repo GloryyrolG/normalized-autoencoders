@@ -76,11 +76,10 @@ nae = NAE(encoder, decoder, sampling='x',
            x_step=50, x_stepsize=None, x_noise_std=0.05, x_bound=(-5, 5), x_clip_langevin_grad=None,
            z_step=None, z_stepsize=None, z_noise_std=None, z_bound=None,
            gamma=1, spherical=False,
-           sigma=0.5, sigma_trainable=True,
            temperature=0.1, temperature_trainable=True,
            l2_norm_reg=None, l2_norm_reg_en=None, z_norm_reg=0.01,
            initial_dist='uniform', replay=True, replay_ratio=0.95, buffer_size=10000,
-           deterministic=True, mh=True)
+           mh=True)
 
 x = torch.rand((1,2)).to(device)
 nae._set_x_shape(x)
@@ -247,6 +246,6 @@ ax.scatter(sample_om[:,0], sample_om[:,1], s=40, alpha=0.5)
 ax.axis('equal')
 # plt.tight_layout(pad=0.)
 fig.subplots_adjust(wspace=0,hspace=0)
-plt.savefig('fig_training_methods.pdf', bbox_inches='tight')
+plt.savefig('../results/fig_training_methods.png', bbox_inches='tight')
 
 
