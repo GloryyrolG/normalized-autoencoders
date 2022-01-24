@@ -81,7 +81,7 @@ vae = VAE(encoder, decoder, sigma_trainable=True, use_mean=False)
 vae.load_state_dict(torch.load('vae_1_8gaussians.pth'))
 vae.to(device);
 
-print(f"sigma {vae.decoder.sigma:.6f}")
+print(f"sigma (zdim = 1) {vae.decoder.sigma:.6f}")
 print("vae", vae)
 
 # Sampling VAEs.
@@ -105,6 +105,8 @@ decoder = FCResNet(zdim, 2, res_dim=256, n_res_hidden=1024, n_resblock=5, out_ac
 vae = VAE(encoder, decoder, sigma_trainable=True, use_mean=False)
 vae.load_state_dict(torch.load('vae_3_8gaussians.pth'))
 vae.to(device);
+
+print(f"sigma (zdim = 3) {vae.decoder.sigma:.6f}")
 
 # Sampling VAEs.
 with torch.no_grad():
