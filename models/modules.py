@@ -510,6 +510,7 @@ class FCResNet(nn.Module):
         if out_activation is not None:
             l_layer.append(out_activation)
         self.net = nn.Sequential(*l_layer)
+        self.out_dim = out_dim
 
     def forward(self, x):
         return self.net(x)
