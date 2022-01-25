@@ -100,7 +100,7 @@ class NAETrainer(BaseTrainer):
 
         '''NAE PASS'''
         # load best autoencoder model
-        ckpt_name = 'model_last.pkl'
+        ckpt_name = 'model_best.pkl'
         print(f"> Loading {ckpt_name}")
         model.load_state_dict(torch.load(os.path.join(logdir, ckpt_name), map_location='cuda:0')['model_state'])
         # model.load_state_dict(torch.load(os.path.join(logdir, ckpt_name), map_location='cuda:0'))
@@ -116,10 +116,10 @@ class NAETrainer(BaseTrainer):
                 d_result = model.train_step(x, nae_opt)
                 logger.process_iter_train_nae(d_result)
 
-                if i % cfg.print_interval == 1:
+                if i % cfg.print_interval == 1 or cfg.print_interval == 1:
                     logger.summary_train_nae(i)
  
-                if i % cfg.val_interval == 1:
+                if i % cfg.val_interval == 1 or cfg.val_interval == 1:
                     '''AUC'''
                     in_pred = self.predict(model, indist_val_loader, self.device)
                     ood1_pred = self.predict(model, oodval_val_loader, self.device)

@@ -85,7 +85,10 @@ data_dict = {'path': 'datasets',
 
 data_dict_ = copy.copy(data_dict)
 data_dict_['dataset'] = args.dataset
+data_dict_['split'] = 'training'
+print("> Testing if overfitting")
 in_dl = get_dataloader(data_dict_)
+data_dict_['split'] = 'evaluation'
 
 l_ood_dl = []
 for ood_name in l_ood:
