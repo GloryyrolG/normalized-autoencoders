@@ -62,7 +62,7 @@ class NAETrainer(BaseTrainer):
                 y = y.to(self.device)
 
                 start_ts = time.time()
-                d_train = model.train_step_ae(x, ae_opt, clip_grad=0.1)  # todo: clip_grad
+                d_train = model.train_step_ae(x, ae_opt, clip_grad=None)  # todo: clip_grad
                 time_meter.update(time.time() - start_ts)
                 logger.process_iter_train(d_train)
 

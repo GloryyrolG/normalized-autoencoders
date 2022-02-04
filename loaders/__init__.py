@@ -191,6 +191,7 @@ def get_dataset(data_dict, split_type=None, data_aug=None, dequant=None):
         size = data_dict.get('size', OOD_SIZE)
         l_aug = []
         l_aug.append(CenterCrop(140))
+        # import warnings; warnings.warn("Cropping 148")
         l_aug.append(Resize(size))
         if original_data_aug is not None:
             l_aug.append(original_data_aug)
@@ -202,6 +203,9 @@ def get_dataset(data_dict, split_type=None, data_aug=None, dequant=None):
         dataset = CelebA_OOD(data_path, split=split_type,
                              transform=data_aug)
         dataset.img_size = (OOD_SIZE, OOD_SIZE)
+
+        import warnings; warnings.warn("Debuggin: checking overfitting")
+        dataset.data = dataset.data[: 50000]
 
     elif name == 'CelebA_SVHN_OOD':
         size = data_dict.get('size', OOD_SIZE)

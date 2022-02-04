@@ -17,18 +17,18 @@ model:
         out_activation: sigmoid
     nae:
         spherical: True
-        gamma: 1
-        sampling: on_manifold
+        gamma: 0  # 1
+        sampling: x  # on_manifold
 
         z_step: 20
         z_stepsize: 1 
         z_noise_std: 0.02
         z_noise_anneal: Null 
         z_clip_langevin_grad: Null
-        x_step: 40
-        x_stepsize: 20
-        x_noise_std: 0.02
-        x_noise_anneal: 1
+        x_step: 60  # 40
+        x_stepsize: 20  # 20
+        x_noise_std: 0.005  # 0.02
+        x_noise_anneal: null  # 1
         x_clip_langevin_grad: 0.01
 
         buffer_size: 10000
@@ -50,11 +50,11 @@ data:
     indist_train:
         dataset: CelebA_OOD 
         path: datasets
-        batch_size: 128
+        batch_size: 64  # 128
         n_workers: 8
         split: training 
         shuffle: True
-        size: 64
+        size: 32
         augmentations:
           hflip:
             p: 0.5
@@ -66,7 +66,7 @@ data:
         batch_size: 128
         n_workers: 8
         split: validation 
-        size: 64
+        size: 32
     ood_val:
         dataset: CelebA_OOD 
         channel: 3
@@ -74,12 +74,12 @@ data:
         batch_size: 128
         split: validation
         n_workers: 8
-        size: 64
+        size: 32
         dequant:
           togray: {}
     ood_target:
         dataset: CelebA_OOD 
-        size: 64
+        size: 32
         path: datasets
         batch_size: 128
         n_workers: 8
@@ -99,7 +99,7 @@ training:
     print_interval: 100
     val_interval: 200
     save_interval: 2000
-    ae_lr: 1.0e-4
+    ae_lr: 2.0e-4  # 1e-4
     nae_lr: 1.0e-5
     temperature_lr: 1.0e-3
     fix_D: false 

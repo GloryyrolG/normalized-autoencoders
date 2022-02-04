@@ -1,6 +1,7 @@
 """
 Misc Utility functions
 """
+from distutils.log import warn
 import os
 import sys
 import logging
@@ -172,7 +173,30 @@ def batch_run(m, dl, device, flatten=False, method='predict', input_type='first'
                 x = x.view(len(x), -1)
             pred = method(x.cuda(device), **kwargs).detach().cpu()
 
+            import warnings; warnings.warn("Debuggin")
+            from torchvision import utils
+
+            x = x.cuda()
+            # nae.forward.
+            d = np.prod(x.shape[1:])
+            z = m.encode(x)
+            recon = m.decoder(z)
+            E = m.error(x, recon) / d
+
+            # print(f"pred {pred}")
+            print(f"E.mean().item() {E.mean().item():.4f}")
+            print(f"E[: 10] {E[: 10]}")
+            utils.save_image(utils.make_grid(torch.cat([x, recon.detach()])), 'results/recon.png')
+            # print(f"recon range {recon.min():.4f}, {recon.max():.4f}")
+
+            # exit(0)
+
         l_result.append(pred)
+
+        if len(l_result) == 8:
+            warnings.warn(f"Debuggin. Just testing few batches ({x.shape[0]} x {len(l_result)})")
+            break
+
     return torch.cat(l_result)
 
 

@@ -69,7 +69,7 @@ if args.dataset in {'MNIST_OOD', 'FashionMNIST_OOD'}:
     size = 28
     channel = 1
 elif args.dataset == 'CelebA_OOD':
-    size = 64
+    size = 32  # 64
     channel = 3
 else:
     size = 32
@@ -80,6 +80,7 @@ data_dict = {'path': 'datasets',
              'batch_size': 64,
              'n_workers': 4,
              'split': 'evaluation',
+             'dequant': {'UniformDequantize': {}},
              'path': 'datasets'}
 
 
@@ -106,6 +107,19 @@ else:
 
 model.eval()
 model.to(device)
+
+print(f"model.sampling {model.sampling}")
+
+def model_gen():
+    dummy_x = next(iter(in_dl))[0].to(device)
+    while True:
+        model.eval()
+        model._set_z_shape(dummy_x)
+        model._set_x_shape(dummy_x)
+        yield model.sample(dummy_x)['sample_x'], None
+
+# Uncomment to replace the last.
+# l_ood_dl[-1] = model_gen()
 
 in_pred = batch_run(model, in_dl, device=device, no_grad=False)
 

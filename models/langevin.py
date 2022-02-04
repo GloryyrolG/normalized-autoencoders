@@ -145,6 +145,7 @@ def sample_langevin_v2(x, model, stepsize, n_steps, noise_scale=None, intermedia
 
         if noise_anneal is not None:
             noise_scale_ = noise_scale / (1 + i_step)
+            # stepsize_ = stepsize / (1. + i_step) ** 2
 
         l_dynamics.append(dynamics.detach().cpu())
         l_drift.append((- stepsize * grad_E_x).detach().cpu())

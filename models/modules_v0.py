@@ -355,7 +355,7 @@ class Decoder(nn.Module):
         return y
 
 
-class ConvNet32(nn.Module):
+class ConvNet64(nn.Module):
     """ConvNet architecture for CelebA64 following Ghosh et al., 2019"""
     def __init__(self, in_chan=3, out_chan=64, nh=32, out_activation='linear', activation='relu',
                  num_groups=None, use_bn=False):
@@ -363,8 +363,8 @@ class ConvNet32(nn.Module):
         self.conv1 = nn.Conv2d(in_chan, nh * 4, kernel_size=5, bias=True, stride=2)
         self.conv2 = nn.Conv2d(nh * 4, nh * 8, kernel_size=5, bias=True, stride=2)
         self.conv3 = nn.Conv2d(nh * 8, nh * 16, kernel_size=5, bias=True, stride=2)
-        # self.conv4 = nn.Conv2d(nh * 16, nh * 32, kernel_size=5, bias=True, stride=2)
-        self.fc1 = nn.Conv2d(nh * 16, out_chan, kernel_size=1, bias=True)
+        self.conv4 = nn.Conv2d(nh * 16, nh * 32, kernel_size=5, bias=True, stride=2)
+        self.fc1 = nn.Conv2d(nh * 32, out_chan, kernel_size=1, bias=True)
         self.in_chan, self.out_chan = in_chan, out_chan
         self.num_groups = num_groups
         self.use_bn = use_bn
@@ -382,15 +382,14 @@ class ConvNet32(nn.Module):
         if num_groups is not None:
             layers.append(self.get_norm_layer(num_channels=nh * 16))
         layers.append(get_activation(activation))
-        # layers.append(self.conv4)
-        # if num_groups is not None:
-        #     layers.append(self.get_norm_layer(num_channels=nh * 32))
-        # layers.append(get_activation(activation))
+        layers.append(self.conv4)
+        if num_groups is not None:
+            layers.append(self.get_norm_layer(num_channels=nh * 32))
+        layers.append(get_activation(activation))
         layers.append(self.fc1)
         out_activation = get_activation(out_activation)
         if out_activation is not None:
             layers.append(out_activation)
-        # layers.append(nn.AdaptiveAvgPool2d(1))
 
         self.net = nn.Sequential(*layers)
 
@@ -404,13 +403,13 @@ class ConvNet32(nn.Module):
             return nn.BatchNorm2d(num_channels)
 
 
-class DeConvNet32(nn.Module):
+class DeConvNet64(nn.Module):
     """ConvNet architecture for CelebA64 following Ghosh et al., 2019"""
     def __init__(self, in_chan=64, out_chan=3, nh=32, out_activation='linear', activation='relu',
                  num_groups=None, use_bn=False):
         super().__init__()
-        self.fc1 = nn.ConvTranspose2d(in_chan, nh * 16, kernel_size=8, bias=True)
-        # self.conv1 = nn.ConvTranspose2d(nh * 32, nh * 16, kernel_size=4, stride=2, padding=1, bias=True)
+        self.fc1 = nn.ConvTranspose2d(in_chan, nh * 32, kernel_size=8, bias=True)
+        self.conv1 = nn.ConvTranspose2d(nh * 32, nh * 16, kernel_size=4, stride=2, padding=1, bias=True)
         self.conv2 = nn.ConvTranspose2d(nh * 16, nh * 8, kernel_size=4, stride=2, padding=1, bias=True)
         self.conv3 = nn.ConvTranspose2d(nh * 8, nh * 4, kernel_size=4, stride=2, padding=1, bias=True)
         self.conv4 = nn.ConvTranspose2d(nh * 4, out_chan, kernel_size=1, bias=True)
@@ -421,12 +420,12 @@ class DeConvNet32(nn.Module):
         layers = []
         layers.append(self.fc1)
         if num_groups is not None:
+            layers.append(self.get_norm_layer(num_channels=nh * 32))
+        layers.append(get_activation(activation))
+        layers.append(self.conv1)
+        if num_groups is not None:
             layers.append(self.get_norm_layer(num_channels=nh * 16))
         layers.append(get_activation(activation))
-        # layers.append(self.conv1)
-        # if num_groups is not None:
-        #     layers.append(self.get_norm_layer(num_channels=nh * 16))
-        # layers.append(get_activation(activation))
         layers.append(self.conv2)
         if num_groups is not None:
             layers.append(self.get_norm_layer(num_channels=nh * 8))

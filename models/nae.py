@@ -83,6 +83,9 @@ class FFEBM(nn.Module):
             return self.sample_omi(n_sample, device, replay=replay)
 
     def sample_x(self, n_sample=None, device=None, x0=None, replay=False):
+        # print(self.__dict__)
+        # print('temperature' in self.__dict__, self.temperature)
+
         if x0 is None:
             x0 = self.initial_sample(n_sample, device=device)
         d_sample_result = sample_langevin_v2(x0.detach(), self.energy, stepsize=self.x_stepsize, n_steps=self.x_step,

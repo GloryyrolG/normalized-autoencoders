@@ -138,6 +138,13 @@ def get_net(in_dim, out_dim, **kwargs):
             out_activation=out_activation,
             num_groups=num_groups,
         )
+    elif kwargs['arch'] == 'Encoder':
+        from models.modules import Encoder
+        net = Encoder()
+        print(net.conv_output_size)
+    elif kwargs['arch'] == 'Decoder':
+        from models.modules import Decoder
+        net = Decoder()
 
     return net
 
